@@ -1,0 +1,170 @@
+{
+  "document_info": {
+    "title": "Disfruta P2P Lending Platform - System Architecture Design",
+    "version": "1.0",
+    "date": "2025-06-13",
+    "architect": "Bob",
+    "project_name": "disfruta_p2p_lending_platform"
+  },
+  "implementation_approach": {
+    "overview": "Hybrid architecture combining traditional web technologies with blockchain infrastructure for secure, scalable P2P lending platform",
+    "key_decisions": {
+      "data_strategy": "On-chain: loan terms, funding, repayments. Off-chain: user profiles, KYC, credit scores",
+      "architecture": "Microservices with React frontend, Node.js backend, Solidity smart contracts",
+      "scaling": "Layer-2 integration (Polygon) for cost optimization, horizontal microservices scaling"
+    },
+    "tech_stack": {
+      "frontend": "React 18 + TypeScript + Tailwind CSS + Redux Toolkit",
+      "backend": "Node.js + Express + TypeScript + Prisma ORM",
+      "blockchain": "Solidity 0.8.19 + Hardhat + ethers.js",
+      "database": "PostgreSQL + Redis caching",
+      "infrastructure": "Docker + Kubernetes + AWS/GCP"
+    }
+  },
+  "frontend_architecture": {
+    "component_structure": {
+      "pages": {
+        "HomePage": "Landing page with platform stats and CTAs",
+        "AuthenticationPage": "Login, signup, MFA verification",
+        "BorrowerDashboard": "Loan application and management",
+        "LenderDashboard": "Investment opportunities and portfolio"
+      },
+      "shared_components": {
+        "WalletConnector": "Web3 wallet integration (MetaMask, WalletConnect)",
+        "TransactionMonitor": "Blockchain transaction tracking",
+        "CreditScoreDisplay": "Credit score visualization"
+      }
+    },
+    "state_management": {
+      "redux_slices": ["auth", "loans", "investments", "blockchain"],
+      "middleware": ["Redux Toolkit Query for API", "Redux Persist for state persistence"]
+    }
+  },
+  "smart_contract_architecture": {
+    "core_contracts": {
+      "LoanFactory": {
+        "purpose": "Creates and manages loan contract instances",
+        "functions": ["createLoan", "approveLoan", "pauseLoan"],
+        "events": ["LoanCreated", "LoanApproved"]
+      },
+      "Loan": {
+        "purpose": "Individual loan with funding and repayment logic",
+        "functions": ["fundLoan", "withdrawFunds", "makeRepayment", "distributeFunds"],
+        "state": ["borrower", "principal", "interestRate", "term", "status", "lenders"]
+      },
+      "LendingPool": {
+        "purpose": "Collective investment pool for auto-investing",
+        "functions": ["deposit", "withdraw", "autoInvest", "claimReturns"]
+      },
+      "Treasury": {
+        "purpose": "Platform fees and reserve fund management",
+        "functions": ["collectFee", "distributeFees", "useReserveForDefault"]
+      }
+    },
+    "security_patterns": {
+      "access_control": "OpenZeppelin AccessControl with roles",
+      "reentrancy": "ReentrancyGuard on all state-changing functions",
+      "upgrades": "Transparent proxy pattern with timelock",
+      "emergency": "Circuit breaker pause functionality"
+    }
+  },
+  "database_design": {
+    "core_tables": {
+      "users": "Account info with wallet_address and kyc_status",
+      "user_profiles": "PII data encrypted, GDPR compliant",
+      "loans": "Loan details with contract_address linkage",
+      "investments": "Lender investments with expected returns",
+      "credit_assessments": "Credit scores and risk grades with expiry",
+      "transactions": "All financial transactions with blockchain hashes"
+    },
+    "performance": {
+      "indexing": "Indexes on foreign keys and query fields",
+      "caching": "Redis for sessions, API responses, rate limiting",
+      "partitioning": "Date-based partitioning for large tables"
+    }
+  },
+  "api_design": {
+    "authentication_endpoints": {
+      "POST /auth/register": "User registration",
+      "POST /auth/login": "JWT authentication",
+      "POST /auth/verify-mfa": "Multi-factor verification"
+    },
+    "loan_endpoints": {
+      "GET /loans": "List available loans with filters",
+      "POST /loans": "Create loan application",
+      "POST /loans/:id/fund": "Invest in loan",
+      "POST /loans/:id/repay": "Make repayment"
+    },
+    "blockchain_endpoints": {
+      "POST /blockchain/deploy-loan": "Deploy loan contract",
+      "GET /blockchain/transaction-status": "Check tx status",
+      "POST /blockchain/estimate-gas": "Gas estimation"
+    },
+    "rate_limiting": "1000/hour authenticated, 100/hour anonymous"
+  },
+  "security_architecture": {
+    "smart_contract_security": {
+      "development": "100% test coverage, peer review, static analysis",
+      "auditing": "Third-party audits, bug bounty program",
+      "monitoring": "Real-time contract monitoring and alerts"
+    },
+    "web_security": {
+      "authentication": "JWT + MFA, password complexity, account lockout",
+      "transport": "TLS 1.3, HSTS headers, certificate pinning",
+      "input_validation": "Server-side validation, XSS/SQL injection prevention"
+    },
+    "data_protection": {
+      "encryption": "AES-256 at rest, TLS 1.3 in transit",
+      "privacy": "GDPR compliance, data minimization, consent management"
+    }
+  },
+  "integration_patterns": {
+    "blockchain_integration": {
+      "event_driven": "Listen to smart contract events for state updates",
+      "transaction_management": "Gas optimization, retry mechanisms",
+      "state_sync": "Dual writes to blockchain and database"
+    },
+    "external_services": {
+      "credit_bureaus": "Experian, Equifax, TransUnion APIs",
+      "payments": "Stripe, ACH, wire transfer integration",
+      "kyc_providers": "Document verification services",
+      "notifications": "Email (SendGrid), SMS (Twilio), Push (Firebase)"
+    }
+  },
+  "scalability_considerations": {
+    "horizontal_scaling": {
+      "microservices": "Independent service scaling with Kubernetes",
+      "load_balancing": "Application and database load balancers",
+      "auto_scaling": "HPA based on CPU, memory, custom metrics"
+    },
+    "blockchain_scaling": {
+      "layer2": "Polygon integration for cost reduction",
+      "gas_optimization": "Batch transactions, off-chain computation",
+      "state_channels": "For frequent micro-transactions"
+    }
+  },
+  "deployment_architecture": {
+    "environments": {
+      "development": "Local Docker Compose with Hardhat network",
+      "staging": "Kubernetes cluster with Polygon testnet",
+      "production": "Multi-region Kubernetes with mainnet deployment"
+    },
+    "ci_cd": {
+      "pipeline": "GitHub Actions with automated testing",
+      "smart_contract_deployment": "Hardhat deploy with multi-sig approval",
+      "monitoring": "Prometheus + Grafana + ELK stack"
+    },
+    "infrastructure": {
+      "containerization": "Docker multi-stage builds",
+      "orchestration": "Kubernetes with Istio service mesh",
+      "storage": "Persistent volumes for database, IPFS for documents"
+    }
+  },
+  "unclear_aspects": {
+    "regulatory_compliance": "Specific P2P lending regulations vary by jurisdiction",
+    "oracle_integration": "Choice of oracle providers for credit data needs clarification",
+    "cross_chain_strategy": "Timeline for additional blockchain network support",
+    "institutional_integration": "Specific requirements for institutional lender onboarding",
+    "governance_token": "Token economics and distribution mechanism details needed"
+  }
+}

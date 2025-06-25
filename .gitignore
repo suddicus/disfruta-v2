@@ -1,0 +1,89 @@
+# Node modules
+node_modules/
+.pnpm/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Build output
+dist/
+build/
+out/
+
+# Coverage and test reports
+coverage/
+.nyc_output/
+test-results.xml
+*.lcov
+
+# Hardhat artifacts
+artifacts/
+cache/
+typechain/
+*.tsbuildinfo
+
+# Deployment and blockchain data
+*.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+.env.example
+.env.production
+hardhat-network-*
+*.db
+*.db-journal
+
+# VSCode settings
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# MongoDB local dev data
+mongodb-data/
+
+# Docker
+docker-compose.override.yml
+docker-compose.dev.yml
+.docker/
+
+# React
+*.local
+*.lock
+*.cache/
+.eslintcache
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional: Firebase, AWS credentials, GCP configs (if any)
+firebase-debug.log
+.firebaserc
+.aws/
+.gcloud/
+
+# Optional: Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.yarnrc.yml
