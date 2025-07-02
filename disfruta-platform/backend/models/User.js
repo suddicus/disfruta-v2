@@ -1,12 +1,19 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
-    required: [true, 'Please add a name'],
+    required: [true, 'Please add a first name'],
     trim: true,
-    maxlength: [50, 'Name cannot be more than 50 characters']
+    maxlength: [50, 'First name cannot be more than 50 characters']
+  },
+  lastName: {
+    type: String,
+    required: [true, 'Please add a last name'],
+    trim: true,
+    maxlength: [50, 'Last name cannot be more than 50 characters']
   },
   email: {
     type: String,
@@ -20,9 +27,13 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Please add a password'],
+    required: function() {
+      // Only require password for new documents or when password is being modified
+      return this.isNew && !this.password;
+    },
+    // required: false,
     minlength: 8,
-    select: false
+    // select: false
   },
   role: {
     type: String,
@@ -186,18 +197,51 @@ userSchema.index({ creditScore: 1 });
 
 // Encrypt password using bcrypt
 userSchema.pre('save', async function(next) {
+  console.log('🔍 Pre-save middleware triggered');
+  console.log('🔍 Password modified?', this.isModified('password'));
+  console.log('🔍 Raw password value:', this.password);
+  console.log('🔍 Password type:', typeof this.password);
+  
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  // const salt = await bcrypt.genSalt(10);
+  // this.password = await bcrypt.hash(this.password, salt);
+  // next();
+  // Check if password is already hashed (starts with $2a$ or $2b$)
+  if (this.password && this.password.startsWith('$2')) {
+    console.log('🔍 Password already hashed, skipping...');
+    return next();
+  }
+
+  // Add validation to ensure password exists and is a string
+  if (!this.password || typeof this.password !== 'string') {
+    console.error('🔍 Password is invalid:', this.password);
+    return next(new Error('Password is required and must be a string'));
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    console.log('🔍 Password hashed successfully in pre-save middleware');
+    next();
+  } catch (error) {
+    console.error('🔍 Error in pre-save middleware:', error);
+    next(error);
+  }
 });
 
 // Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Add this method to userSchema.methods
+userSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || '7d'
+  });
 };
 
 // Update credit score

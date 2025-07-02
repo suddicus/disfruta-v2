@@ -1,0 +1,69 @@
+src
+└── ├── abis
+└── │   ├── CreditScoring.dbg.json
+└── │   ├── CreditScoring.json
+└── │   ├── index.js
+└── │   ├── LendingPool.dbg.json
+└── │   ├── LendingPool.json
+└── │   ├── Loan.dbg.json
+└── │   ├── LoanFactory.dbg.json
+└── │   ├── LoanFactory.json
+└── │   ├── Loan.json
+└── │   ├── Treasury.dbg.json
+└── │   ├── Treasury.json
+└── │   ├── UserRegistry.dbg.json
+└── │   └── UserRegistry.json
+└── ├── App.jsx
+└── ├── components
+└── │   ├── Auth
+└── │   │   ├── LoginForm.jsx
+└── │   │   └── SignupForm.jsx
+└── │   ├── Borrower
+└── │   │   ├── BorrowerDashboard.jsx
+└── │   │   └── LoanApplication.jsx
+└── │   ├── Common
+└── │   │   └── WalletConnector.jsx
+└── │   ├── Layout
+└── │   │   ├── Footer.jsx
+└── │   │   └── Header.jsx
+└── │   └── Lender
+└── │       ├── InvestmentOpportunities.jsx
+└── │       └── LenderDashboard.jsx
+└── ├── index.css
+└── ├── lose2.sh
+└── ├── lose.sh
+└── ├── main.jsx
+└── ├── pages
+└── │   ├── AboutPage.jsx
+└── │   ├── AuthPage.jsx
+└── │   ├── BorrowerPage.jsx
+└── │   ├── HomePage.jsx
+└── │   └── LenderPage.jsx
+└── ├── services
+└── │   ├── api.js
+└── │   ├── blockchain.js
+└── │   └── creditService.js
+└── ├── store
+└── │   ├── slices
+└── │   │   ├── authSlice.js
+└── │   │   ├── blockchainSlice.js
+└── │   │   └── loanSlice.js
+└── │   └── store.js
+└── ├── structure-src.txt
+└── ├── structure-..txt
+└── ├── __tests__
+└── │   ├── components
+└── │   ├── e2e
+└── │   │   ├── cypress.config.js
+└── │   │   └── login.cy.js
+└── │   ├── integration
+└── │   │   └── app.integration.test.jsx
+└── │   ├── package.json
+└── │   ├── pages
+└── │   ├── services
+└── │   │   └── api.test.js
+└── │   ├── setup.js
+└── │   └── vitest.config.js
+└── └── utils
+└──     ├── constants.js
+└──     └── helpers.js

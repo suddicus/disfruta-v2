@@ -11,8 +11,10 @@ const AuthPage = () => {
   // Redirect if already authenticated
   if (isAuthenticated) {
     if (user?.userType === 'borrower') {
+      console.log('seasons.auth borrower');
       return <Navigate to="/borrow" replace />;
     } else if (user?.userType === 'lender') {
+      console.log('seasons.auth lender');
       return <Navigate to="/lend" replace />;
     } else {
       return <Navigate to="/" replace />;

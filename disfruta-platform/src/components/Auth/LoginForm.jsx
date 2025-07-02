@@ -63,7 +63,7 @@ const LoginForm = ({ onToggleForm }) => {
     try {
       const response = await apiService.login(formData);
       
-      if (response.success) {
+      if (response.status === 'success') {
         dispatch(login({
           user: response.user,
           token: response.token
@@ -72,9 +72,11 @@ const LoginForm = ({ onToggleForm }) => {
         toast.success('Login successful!');
         
         // Redirect based on user type
-        if (response.user.isBorrower) {
+        if (response.user.userType === 'borrower') {
+          console.log('seasons.auth borrower login');
           navigate('/borrow');
-        } else if (response.user.isLender) {
+        } else if (response.user.userType === 'lender') {
+          console.log('seasons.auth lender login');
           navigate('/lend');
         } else {
           navigate('/');

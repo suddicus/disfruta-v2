@@ -16,6 +16,8 @@ const register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, userType, phoneNumber, address } = req.body;
 
+    console.log('📝 Registration request:', { firstName, lastName, email, userType });
+
     // Check if user exists
     const existingUser = await db.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -25,55 +27,62 @@ const register = async (req, res) => {
       });
     }
 
-    // Create user
-    const user = await db.create({
+    // Create user with statistics
+    const userData = {
       firstName,
       lastName,
       email: email.toLowerCase(),
       password,
       userType,
-      phoneNumber,
+      phone: phoneNumber,
       address,
       emailVerificationToken: crypto.randomBytes(20).toString('hex'),
-      emailVerificationExpire: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
-    });
+      emailVerificationExpire: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      isVerified: true, // Auto-verify for demo
+      isActive: true,
+      statistics: {
+        totalLoaned: 0,
+        totalBorrowed: 0,
+        totalInvested: 0,
+        totalEarned: 0,
+        activeLoans: 0,
+        completedLoans: 0,
+        defaultedLoans: 0
+      }
+    };
+
+    // Create user - this will trigger pre-save middleware once
+    const user = await db.create(userData);
+
+    console.log('✅ User created successfully:', user.email);
 
     // Generate tokens
     const token = generateToken({ id: user._id });
     const refreshToken = generateRefreshToken({ id: user._id });
 
-    // Remove password from output
-    user.password = undefined;
-
-    // Update user statistics
-    user.statistics = {
-      totalLoaned: 0,
-      totalBorrowed: 0,
-      totalInvested: 0,
-      totalEarned: 0,
-      activeLoans: 0,
-      completedLoans: 0,
-      defaultedLoans: 0
+    // Create response user object (don't modify the original user)
+    const responseUser = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      userType: user.userType,
+      isVerified: user.isVerified,
+      kycStatus: user.kycStatus,
+      creditScore: user.creditScore,
+      phone: user.phone,
+      address: user.address,
+      statistics: user.statistics,
+      isBorrower: ['borrower', 'both'].includes(user.userType),
+      isLender: ['lender', 'both'].includes(user.userType)
     };
-
-    await user.save();
 
     res.status(201).json({
       status: 'success',
       message: 'User registered successfully. Please verify your email.',
       token,
       refreshToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        userType: user.userType,
-        isVerified: user.isVerified,
-        kycStatus: user.kycStatus,
-        creditScore: user.creditScore,
-        isBorrower: ['borrower', 'both'].includes(user.userType),
-        isLender: ['lender', 'both'].includes(user.userType)
-      }
+      user: responseUser
     });
 
   } catch (error) {
@@ -84,8 +93,7 @@ const register = async (req, res) => {
       details: error.message
     });
   }
-};
-
+}
 // @desc    Authenticate user & get token
 // @route   POST /api/auth/login
 // @access  Public

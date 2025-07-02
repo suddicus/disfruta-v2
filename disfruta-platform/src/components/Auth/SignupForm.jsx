@@ -39,23 +39,33 @@ const SignupForm = ({ onToggleForm }) => {
     { code: 'JP', name: 'Japan' },
   ];
 
+  // Enhanced validation for SignupForm.jsx
+  // Replace your existing validateStep1 function with this:
+
   const validateStep1 = () => {
     const newErrors = {};
 
-    if (!formData.email) {
+    // Email validation
+    if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
 
+    // Enhanced password validation (matching backend requirements)
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    } else {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      
+      if (formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters long';
+      } else if (!passwordRegex.test(formData.password)) {
+        newErrors.password = 'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character (@$!%*?&)';
+      }
     }
 
+    // Confirm password validation
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
@@ -64,6 +74,82 @@ const SignupForm = ({ onToggleForm }) => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // Enhanced password field with real-time validation feedback
+  const renderPasswordField = () => {
+    const hasMinLength = formData.password.length >= 8;
+    const hasLowercase = /[a-z]/.test(formData.password);
+    const hasUppercase = /[A-Z]/.test(formData.password);
+    const hasNumber = /\d/.test(formData.password);
+    const hasSpecialChar = /[@$!%*?&]/.test(formData.password);
+
+    return (
+      <div>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          Password
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Lock className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? 'text' : 'password'}
+            value={formData.password}
+            onChange={handleChange}
+            className={`block w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+              errors.password 
+                ? 'border-red-300 bg-red-50' 
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            placeholder="Create a strong password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            {showPassword ? (
+              <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+            ) : (
+              <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+            )}
+          </button>
+        </div>
+        
+        {/* Password requirements with real-time feedback */}
+        {formData.password && (
+          <div className="mt-2 text-xs space-y-1">
+            <div className={`flex items-center ${hasMinLength ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="mr-1">{hasMinLength ? '✓' : '○'}</span>
+              At least 8 characters
+            </div>
+            <div className={`flex items-center ${hasLowercase ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="mr-1">{hasLowercase ? '✓' : '○'}</span>
+              One lowercase letter
+            </div>
+            <div className={`flex items-center ${hasUppercase ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="mr-1">{hasUppercase ? '✓' : '○'}</span>
+              One uppercase letter
+            </div>
+            <div className={`flex items-center ${hasNumber ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="mr-1">{hasNumber ? '✓' : '○'}</span>
+              One number
+            </div>
+            <div className={`flex items-center ${hasSpecialChar ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className="mr-1">{hasSpecialChar ? '✓' : '○'}</span>
+              One special character (@$!%*?&)
+            </div>
+          </div>
+        )}
+        
+        {errors.password && (
+          <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+        )}
+      </div>
+    );
   };
 
   const validateStep2 = () => {
@@ -122,6 +208,8 @@ const SignupForm = ({ onToggleForm }) => {
     }
   };
 
+
+  // Enhanced handleNext with proper validation blocking
   const handleNext = () => {
     let isValid = false;
     
@@ -131,14 +219,103 @@ const SignupForm = ({ onToggleForm }) => {
       isValid = validateStep2();
     }
     
+    // Only proceed if validation passes
     if (isValid) {
       setStep(step + 1);
+    } else {
+      // Focus on first error field
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        document.getElementById(firstErrorField)?.focus();
+      }
     }
   };
 
-  const handleBack = () => {
-    setStep(step - 1);
-  };
+  // Enhanced error handling in handleSubmit
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   if (!validateStep3()) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const registrationData = {
+  //       email: formData.email,
+  //       password: formData.password,
+  //       firstName: formData.firstName,
+  //       lastName: formData.lastName,
+  //       phoneNumber: formData.phoneNumber,
+  //       country: formData.country,
+  //       userType: formData.userType,
+  //     };
+
+  //     const response = await apiService.register(registrationData);
+      
+  //     if (response.success === 'success') {
+  //       dispatch(login({
+  //         user: response.user,
+  //         token: response.token
+  //       }));
+        
+  //       toast.success('Account created successfully!');
+        
+  //       // Fixed navigation logic
+  //       if (formData.userType === 'borrower') {
+  //         navigate('/borrow');
+  //       } else {
+  //         navigate('/lend');
+  //       }
+  //     } else {
+  //       // Handle backend response errors
+  //       if (response.errors) {
+  //         const backendErrors = {};
+  //         response.errors.forEach(error => {
+  //           backendErrors[error.field] = error.message;
+  //         });
+  //         setErrors(backendErrors);
+          
+  //         // Go back to appropriate step if there are field errors
+  //         if (backendErrors.email || backendErrors.password) {
+  //           setStep(1);
+  //         } else if (backendErrors.firstName || backendErrors.lastName || backendErrors.phoneNumber) {
+  //           setStep(2);
+  //         }
+  //       }
+        
+  //       toast.error(response.message || 'Registration failed');
+  //     }
+  //   } catch (error) {
+  //     console.error('Registration error:', error);
+      
+  //     // Handle different error types
+  //     if (error.response?.status === 409) {
+  //       toast.error('Email address is already registered');
+  //       setErrors({ email: 'This email is already registered' });
+  //       setStep(1);
+  //     } else if (error.response?.status === 400 && error.response?.data?.errors) {
+  //       // Handle backend validation errors
+  //       const backendErrors = {};
+  //       error.response.data.errors.forEach(err => {
+  //         backendErrors[err.field] = err.message;
+  //       });
+  //       setErrors(backendErrors);
+        
+  //       // Show specific field error message
+  //       const firstError = error.response.data.errors[0];
+  //       toast.error(firstError.message);
+        
+  //       // Navigate to appropriate step
+  //       if (backendErrors.email || backendErrors.password) {
+  //         setStep(1);
+  //       } else if (backendErrors.firstName || backendErrors.lastName || backendErrors.phoneNumber) {
+  //         setStep(2);
+  //       }
+  //     } else {
+  //       toast.error('Registration failed. Please try again.');
+  //     }
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -146,8 +323,10 @@ const SignupForm = ({ onToggleForm }) => {
     if (!validateStep3()) {
       return;
     }
-
+  
     try {
+      console.log('📝 Attempting registration...');
+      
       const registrationData = {
         email: formData.email,
         password: formData.password,
@@ -157,36 +336,79 @@ const SignupForm = ({ onToggleForm }) => {
         country: formData.country,
         userType: formData.userType,
       };
-
+  
       const response = await apiService.register(registrationData);
       
-      if (response.success) {
+      console.log('📡 Registration response:', response);
+      
+      // Fix: Check for backend response format {status: 'success'} instead of {success: true}
+      if (response.status === 'success') {
+        // Store auth data
         dispatch(login({
           user: response.user,
           token: response.token
         }));
         
-        toast.success('Account created successfully!');
+        console.log('✅ Registration successful, user data:', response.user);
         
-        // Redirect based on user type
-        if (formData.userType === 'borrower') {
+        // Show success toast with checkmark
+        toast.success('Account created successfully!', {
+          icon: '🎉',
+          duration: 4000,
+        });
+        
+        // Fix: Use userType from formData for navigation
+        const { userType } = formData;
+        
+        console.log('🧭 Navigating based on userType:', userType);
+        
+        // Navigate based on user type selected during registration
+        if (userType === 'borrower') {
+          console.log('🎯 Redirecting to borrower dashboard...');
           navigate('/borrow');
-        } else {
+        } else if (userType === 'lender') {
+          console.log('🎯 Redirecting to lender dashboard...');
           navigate('/lend');
+        } else {
+          console.log('🎯 Redirecting to main dashboard...');
+          navigate('/dashboard');
         }
       } else {
-        toast.error(response.message || 'Registration failed');
+        // Handle backend error response
+        console.error('❌ Registration failed:', response.message);
+        toast.error(response.message || 'Registration failed', {
+          icon: '❌',
+          duration: 4000,
+        });
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('❌ Registration error:', error);
       
-      if (error.response?.status === 409) {
-        toast.error('Email address is already registered');
-        setStep(1);
+      // Handle specific error cases
+      if (error.message.includes('409') || error.message.includes('already exists')) {
+        toast.error('Email address is already registered', {
+          icon: '⚠️',
+          duration: 5000,
+        });
+        setStep(1); // Go back to step 1 to change email
+      } else if (error.message.includes('400')) {
+        toast.error('Please check your information and try again', {
+          icon: '⚠️',
+          duration: 4000,
+        });
       } else {
-        toast.error('Registration failed. Please try again.');
+        toast.error('Registration failed. Please try again.', {
+          icon: '❌',
+          duration: 4000,
+        });
       }
     }
+  };
+
+  const handleBack = () => {
+    setStep(step - 1);
+    // Clear any errors when going back
+    setErrors({});
   };
 
   const renderStep1 = () => (

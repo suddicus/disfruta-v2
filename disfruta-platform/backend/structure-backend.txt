@@ -1,0 +1,48 @@
+backend
+└── ├── config
+└── │   ├── database.js
+└── │   └── jwt.js
+└── ├── controllers
+└── │   ├── adminController.js
+└── │   ├── authController.js
+└── │   ├── investmentController.js
+└── │   ├── loanController.js
+└── │   ├── paymentController.js
+└── │   └── userController.js
+└── ├── middleware
+└── │   ├── auth.js
+└── │   ├── errorHandler.js
+└── │   └── validation.js
+└── ├── models
+└── │   ├── Investment.js
+└── │   ├── Loan.js
+└── │   ├── Payment.js
+└── │   └── User.js
+└── ├── MONGODB_ATLAS_SETUP.md
+└── ├── package.json
+└── ├── package-lock.json
+└── ├── pnpm-lock.yaml
+└── ├── README.md
+└── ├── routes
+└── │   ├── admin.js
+└── │   ├── auth.js
+└── │   ├── investments.js
+└── │   ├── loans.js
+└── │   ├── payments.js
+└── │   ├── upload.js
+└── │   └── users.js
+└── ├── scripts
+└── │   └── test-mongodb-atlas.js
+└── ├── server.js
+└── ├── services
+└── │   ├── blockchainService.js
+└── │   ├── creditScoring.js
+└── │   ├── emailService.js
+└── │   └── mockDatabase.js
+└── ├── structure-backend.txt
+└── ├── __tests__
+└── │   ├── COMPREHENSIVE_TESTING_GUIDE.md
+└── │   └── setup.js
+└── └── utils
+└──     ├── helpers.js
+└──     └── validators.js
