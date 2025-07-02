@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/disfruta';
+    const mongoURI = process.env.MONGO_URI; // || 'mongodb://localhost:27017/disfruta';
     
     console.log('🔄 Connecting to MongoDB...');
     console.log(`📍 URI: ${mongoURI.replace(/:\/\/([^:]+):([^@]+)@/, '://***:***@')}`);

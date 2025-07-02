@@ -1,7 +1,7 @@
 // API Service for backend communication
 class ApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    this.baseURL = import.meta.env.VITE_API_URL;// || 'http://localhost:8000/api';
     this.timeout = 10000;
   }
 
